@@ -8,6 +8,7 @@ using Persistance;
 using ServiceAbstraction;
 using ServiceImplementation;
 using System.Text;
+using System.Threading.RateLimiting;
 
 
 
@@ -64,6 +65,25 @@ namespace SecureTaskApi
            .AddDefaultTokenProviders();
             builder.Services.AddScoped<IAuthService, AuthService>();
 
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+                {
+                    string key = httpContext.User.Identity?.Name ?? httpContext.Connection.RemoteIpAddress.ToString();
+
+                    return RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: key,
+                        partition => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 5,
+                            Window = TimeSpan.FromMinutes(1),
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                            QueueLimit = 0
+                        });
+                });
+
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            });
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -81,6 +101,7 @@ namespace SecureTaskApi
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseRateLimiter();
 
 
             app.MapControllers();
