@@ -13,10 +13,13 @@ namespace Persistance
     public class ApplicationDbContext: IdentityDbContext<User>
 
     {
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
           : base(options)
         {
+             
         }
+        public DbSet<RequestLog> RequestLogs { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -24,6 +27,10 @@ namespace Persistance
             builder.Entity<User>().ToTable("Users");
             builder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims");
             builder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");
+            builder.Entity<RequestLog>()
+          .HasOne(r => r.User)
+          .WithMany(u => u.RequestLogs)
+          .HasForeignKey(r => r.UserId);
         }
         }
 }

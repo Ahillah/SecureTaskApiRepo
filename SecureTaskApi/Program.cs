@@ -1,10 +1,13 @@
 
 using DomainLayer;
+using DomainLayer.RepositoryInterface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Persistance;
+using Persistance.RepositoryImplementation;
+using Presentation.Middleware;
 using ServiceAbstraction;
 using ServiceImplementation;
 using System.Text;
@@ -84,6 +87,8 @@ namespace SecureTaskApi
 
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             });
+            builder.Services.AddScoped<IRequestLogRepository, RequestLogRepository>();
+            builder.Services.AddScoped<IRequestLoggingService, RequestLoggingService>();
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -98,12 +103,11 @@ namespace SecureTaskApi
             }
 
             app.UseHttpsRedirection();
+          
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseMiddleware<RequestLoggingMiddleware>();
             app.UseRateLimiter();
-
-
             app.MapControllers();
 
             app.Run();
