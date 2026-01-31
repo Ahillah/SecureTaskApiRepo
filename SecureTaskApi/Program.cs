@@ -89,6 +89,9 @@ namespace SecureTaskApi
             });
             builder.Services.AddScoped<IRequestLogRepository, RequestLogRepository>();
             builder.Services.AddScoped<IRequestLoggingService, RequestLoggingService>();
+            builder.Services.AddScoped<ITaskRepository,TaskRepository>();
+            builder.Services.AddScoped<ITaskService, TaskService>();
+
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

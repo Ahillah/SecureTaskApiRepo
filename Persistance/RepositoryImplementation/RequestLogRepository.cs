@@ -34,5 +34,7 @@ namespace Persistance.RepositoryImplementation
             _dbContext.RequestLogs.Update(log);
             await _dbContext.SaveChangesAsync(); ;
         }
+
+       
     }
 }

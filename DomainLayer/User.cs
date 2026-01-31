@@ -14,5 +14,6 @@ namespace DomainLayer
         public string? ResetPasswordToken { get; set; }
         public DateTime? ResetPasswordExpiry { get; set; }
         public ICollection<RequestLog> RequestLogs { get; set; }
+        public ICollection<TaskItem> Tasks { get; set; } 
     }
 }

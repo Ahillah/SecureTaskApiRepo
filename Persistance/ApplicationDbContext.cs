@@ -20,6 +20,7 @@ namespace Persistance
              
         }
         public DbSet<RequestLog> RequestLogs { get; set; }
+        public DbSet<TaskItem> Tasks { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -31,6 +32,12 @@ namespace Persistance
           .HasOne(r => r.User)
           .WithMany(u => u.RequestLogs)
           .HasForeignKey(r => r.UserId);
+
+            builder.Entity<TaskItem>()
+            .HasOne(t => t.User)
+               .WithMany(u => u.Tasks)
+               .HasForeignKey(t => t.UserId)
+               .OnDelete(DeleteBehavior.Cascade);
         }
         }
 }
